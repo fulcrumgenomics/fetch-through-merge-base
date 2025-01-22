@@ -8,7 +8,7 @@ By default, the action will pull the "base ref" and "head ref" from the
 [`github` context], i.e. `${{ github.base_ref }}` and `${{ github.head_ref }}`.
 
 This means usage can be as simple adding
-`- uses: BioData/fetch-through-merge-base@v0` to any `pull_request` workflow:
+`- uses: fulcrumgenomics/fetch-through-merge-base@v0` to any `pull_request` workflow:
 
 ```yml
 name: Example Workflow
@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
-      - uses: BioData/fetch-through-merge-base@v0
+      - uses: fulcrumgenomics/fetch-through-merge-base@v0
       # now we've fetched commits through the merge-base of the source branch
       # and target branch of the pull request, so we can do things like:
       - run: git merge-base ${{ github.base_ref }} ${{ github.head_ref }}
@@ -47,15 +47,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: BioData/fetch-through-merge-base@v0
+      - uses: fulcrumgenomics/fetch-through-merge-base@v0
         with:
-          base_ref: main
-          head_ref: ${{ github.sha }}
+          base-ref: main
+          head-ref: ${{ github.sha }}
 ```
 
 ## More details
 
-The default behavior of [`actions/checkout`] v2 is to only fetch a single commit
+The default behavior of [`actions/checkout`] v4 is to only fetch a single commit
 because 1) often that commit is all that's needed and 2) fetching only one
 commit is much faster than fetching everything, especially in large
 repositories. If more history is needed, the `fetch-depth` input can be passed
@@ -68,11 +68,11 @@ aims to provide!
 The way this action works is by iteratively [deepening] the history of the
 shallow clone until the common ancestor of the pull request source branch and
 target branch (i.e. the [`merge-base`]) has been found. By default, the action
-uses `--deepen=10`, but this can be tuned through the `deepen_length` action
+uses `--deepen=10`, but this can be tuned through the `deepen-length` action
 input to optimize the `git fetch` calls for a given repository. The tradeoff of
-setting a large `deepen_length` is that the action may fetch more unnecessary
+setting a large `deepen-length` is that the action may fetch more unnecessary
 commits when running on a pull request that only has a few commits. On the other
-hand, setting a small `deepen_length` may lead to many `git fetch` calls in a
+hand, setting a small `deepen-length` may lead to many `git fetch` calls in a
 row in order to fetch all the commits of a large PR, with each call incurring
 additional overhead.
 

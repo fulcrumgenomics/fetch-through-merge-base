@@ -1,18 +1,72 @@
 name: 'Fetch through merge-base'
+author: Nils Homer (@nh13)
 description: 'Fetch PR commits through the merge-base'
+branding:
+  icon: "code"
+  color: "green"
 inputs:
-  base_ref:
+  base-ref:
     default: ${{ github.base_ref }}
-  head_ref:
+    required: false
+    description: The `base_ref` or target branch in the workflow run
+  head-ref:
     default: ${{ github.head_ref }}
-  deepen_length:
+    required: false
+    description: The `head_ref` or source branch in the workflow run
+  fallback-base-ref:
+    default: "main"
+    required: false
+    description: The `base_ref` to use when `github.base_ref` is not defined (i.e. not a `pull_request` or `pull_request_target`)
+  fallback-head-ref: 
+    default: ${{ github.sha }}
+    required: false
+    description: The `base_ref` to use when `github.base_ref` is not defined (i.e. not a `pull_request` or `pull_request_target`)
+  deepen-length:
     default: 10
+    required: false
+    description: The number of commits to increase from the tip of each `base_ref` and `head_ref` history when `git merge-base` fails to find the common ancestor of the two commits
+  fail-after:
+    default: 100
+    required: false
+    description: The number of attempts to deepen before failing
+
+outputs:
+  base-ref:
+    description: The computed `base_ref` or target branch in the workflow run
+    value: ${{ steps.fetch_through_merge_base.outputs.base-ref }}
+  head-ref:
+    description: The computed `head_ref` or source branch in the workflow run
+    value: ${{ steps.fetch_through_merge_base.outputs.head-ref }}
 runs:
   using: "composite"
   steps: 
-    - run: ${{ github.action_path }}/fetch_through_merge_base.sh
+    - id: fetch_through_merge_base
       shell: bash
       env:
-        BASE_REF: ${{ inputs.base_ref }}
-        HEAD_REF: ${{ inputs.head_ref }}
-        DEEPEN_LENGTH: ${{ inputs.deepen_length }}
+        BASE_REF: ${{ inputs.base-ref }}
+        HEAD_REF: ${{ inputs.head-ref }}
+        FALLBACK_BASE_REF: ${{ inputs.fallback-base-ref }}
+        FALLBACK_HEAD_REF: ${{ inputs.fallback-head-ref }}
+        DEEPEN_LENGTH: ${{ inputs.deepen-length }}
+        FAIL_AFTER: ${{ inputs.fail-after }}
+      run: |
+        set +x
+        if [ -z "$BASE_REF" ] ; then
+            export GITHUB_BASE_REF="$FALLBACK_BASE_REF"
+        else
+            export GITHUB_BASE_REF="$BASE_REF"
+        fi
+        if [ -z "$HEAD_REF" ] ; then
+            export GITHUB_HEAD_REF="$FALLBACK_HEAD_REF"
+        else
+            export GITHUB_HEAD_REF="$HEAD_REF"
+        fi
+        export GITHUB_BASE_REF="${GITHUB_BASE_REF}" >> $GITHUB_ENV
+        export GITHUB_HEAD_REF="${GITHUB_HEAD_REF}" >> $GITHUB_ENV
+        echo base-ref="${GITHUB_BASE_REF}" >> $GITHUB_OUTPUT
+        echo head-ref="${GITHUB_HEAD_REF}" >> $GITHUB_OUTPUT
+        echo "GITHUB_BASE_REF=$GITHUB_BASE_REF"
+        echo "GITHUB_HEAD_REF=$GITHUB_HEAD_REF"
+        export GITHUB_BASE_REF
+        export GITHUB_HEAD_REF
+        bash ${{ github.action_path }}/fetch_through_merge_base.sh        

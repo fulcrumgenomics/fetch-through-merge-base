@@ -1,0 +1,66 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "!**"
+  workflow_call:
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+    - name: Test same hash
+      uses: ./
+      with:
+        head-ref: ${{ github.sha }}
+        base-ref: ${{ github.sha }}
+    - name: Test versus main
+      uses: ./
+      with:
+        head-ref: ${{ github.sha }}
+        base-ref: "main"
+    - name: Test default head-ref fallback
+      uses: ./
+      with:
+        head-ref: ""
+        base-ref: ${{ github.sha }}
+    - name: Test default base-ref fallback
+      uses: ./
+      with:
+        head-ref: ${{ github.sha }}
+        base-ref: ""
+    - name: Get refspecs
+      id: get-refspecs
+      shell: bash
+      run: |
+        echo head-ref=$(git rev-parse HEAD) >> $GITHUB_OUTPUT
+        echo base-ref=$(git rev-parse HEAD~10) >> $GITHUB_OUTPUT
+    - name: Test `fail-after` is not triggered
+      uses: ./
+      with:
+        head-ref: ${{ steps.get-refspecs.outputs.head-ref }}
+        base-ref: ${{ steps.get-refspecs.outputs.base-ref }}
+        deepen-length: 1
+        fail-after: 6
+    - name: Test `fail-after` is triggered
+      id: test_fail-after
+      uses: ./
+      continue-on-error: true
+      with:
+        head-ref: ${{ steps.get-refspecs.outputs.head-ref }}
+        base-ref: ${{ steps.get-refspecs.outputs.base-ref }}
+        deepen-length: 1
+        fail-after: 5
+    - name: Check failures
+      shell: bash
+      run: |
+        if [[ ${{ steps.test_fail-after.outcome }} != "failure" ]]; then
+          echo "Test fail-after failed";
+          exit 1;
+        fi

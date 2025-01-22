@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.0.0] (2024-01-22)
+
+- first official release!
+
+[v1.0.1]: https://github.com/fulcrumgenomics/setup-latch/releases/tag/v1.0.0
+
 ## 0.4.0
 
 * [#1] Add `fallback_base_ref` and `fallback_hed_ref` inputs that can be used when this action is run on not a PR.

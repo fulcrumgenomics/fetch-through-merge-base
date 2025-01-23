@@ -8,34 +8,55 @@ inputs:
   base-ref:
     default: ${{ github.base_ref }}
     required: false
-    description: The `base_ref` or target branch in the workflow run
+    description: >
+      The base ref or target branch in the workflow run.  If empty or 
+      not defined, the `fallback-base-ref` input ref will be used.
   head-ref:
     default: ${{ github.head_ref }}
     required: false
-    description: The `head_ref` or source branch in the workflow run
+    description: >
+      The head ref or source branch in the workflow run.  If empty or
+      not defined, the `fallback-head-ref` input ref will be used.
   fallback-base-ref:
     default: "main"
     required: false
-    description: The `base_ref` to use when `github.base_ref` is not defined (i.e. not a `pull_request` or `pull_request_target`)
+    description: >
+      The base ref to use when `base-ref` is empty or not defined.  For
+      example, when using `github.base_ref` for `base-ref`, and the
+      workflow is not a `pull_request` or `pull_request_target`, then
+      the `base-ref` is not defined, so this ref will be used.
   fallback-head-ref: 
     default: ${{ github.sha }}
     required: false
-    description: The `base_ref` to use when `github.base_ref` is not defined (i.e. not a `pull_request` or `pull_request_target`)
+    description: >
+      The head ref to use when `head-ref` is empty or not defined.  For
+      example, when using `github.head_ref` for `head-ref`, and the
+      workflow is not a `pull_request` or `pull_request_target`, then
+      the `head-ref` is not defined, so this ref will be used.
   deepen-length:
     default: 10
     required: false
-    description: The number of commits to increase from the tip of each `base_ref` and `head_ref` history when `git merge-base` fails to find the common ancestor of the two commits
+    description: >
+      The number of commits to increase from the tip of each base and ref
+      history when `git merge-base` fails to find the common ancestor of 
+      the two commits.
   fail-after:
     default: 100
     required: false
-    description: The number of attempts to deepen before failing
-
+    description: >
+      The number of attempts to deepen before the action fails.
 outputs:
   base-ref:
-    description: The computed `base_ref` or target branch in the workflow run
+    description: >
+      The base ref computed by the workflow run.  This differs from the
+      input base ref when the latter is empty and the fallback base ref
+      is used.
     value: ${{ steps.fetch_through_merge_base.outputs.base-ref }}
   head-ref:
-    description: The computed `head_ref` or source branch in the workflow run
+    description: >
+      The head ref computed by the workflow run.  This differs from the
+      input head ref when the latter is empty and the fallback head ref
+      is used.
     value: ${{ steps.fetch_through_merge_base.outputs.head-ref }}
 runs:
   using: "composite"

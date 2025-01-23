@@ -1,0 +1,39 @@
+{
+  "name": "fetch-through-merge-base",
+  "version": "1.0.0",
+  "description": "fetch through merge base",
+  "scripts": {
+    "build": "tsc && node lib/misc/generate-docs.js",
+    "format": "prettier --write '**/*.ts'",
+    "format-check": "prettier --check '**/*.ts'",
+    "lint": "eslint src/**/*.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fulcrumgenomics/fetch-through-merge-base.git"
+  },
+  "keywords": [
+    "github",
+    "git",
+    "merge-base"
+  ],
+  "author": "@nh13",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fulcrumgenomics/fetch-through-merge-base/issues"
+  },
+  "homepage": "https://github.com/fulcrumgenomics/fetch-through-merge-base#readme",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "@typescript-eslint/eslint-plugin": "^7.9.0",
+    "@typescript-eslint/parser": "^7.9.0",
+    "@vercel/ncc": "^0.38.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-github": "^4.10.2",
+    "js-yaml": "^4.1.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
+  }
+}

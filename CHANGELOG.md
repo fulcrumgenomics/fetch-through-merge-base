@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.0.1] (2024-01-22)
+
+- Add script to update the README docs; updated the README docs (#1)
+
 ## [v1.0.0] (2024-01-22)
 
 - first official release!
@@ -8,9 +12,9 @@
 
 ## 0.4.0
 
-* [#1] Add `fallback_base_ref` and `fallback_hed_ref` inputs that can be used when this action is run on not a PR.
-* [#1] Add `base_ref` and `head_ref` outputs that are computed during the action.
-* [#1] Add `fail_after` input to avoid infinitely trying to find a common ancestor.
+* Add `fallback_base_ref` and `fallback_hed_ref` inputs that can be used when this action is run on not a PR.
+* Add `base_ref` and `head_ref` outputs that are computed during the action.
+* Add `fail_after` input to avoid infinitely trying to find a common ancestor.
 
 ## 0.3.0
 

@@ -1,6 +1,6 @@
 {
   "name": "fetch-through-merge-base",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "fetch through merge base",
   "scripts": {
     "build": "tsc && node lib/misc/generate-docs.js",
@@ -23,8 +23,7 @@
     "url": "https://github.com/fulcrumgenomics/fetch-through-merge-base/issues"
   },
   "homepage": "https://github.com/fulcrumgenomics/fetch-through-merge-base#readme",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^20.12.12",
     "@typescript-eslint/eslint-plugin": "^7.9.0",

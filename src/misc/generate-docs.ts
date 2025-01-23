@@ -112,27 +112,28 @@ function updateUsage(
   }
 
   newReadme.push('```')
-  
+
   const outputs = actionYaml.outputs
-  let firstOutput = true
   newReadme.push('', '### Outputs', '')
   newReadme.push('| Output | Description |')
   newReadme.push('| --- | --- |')
   for (const key of Object.keys(outputs)) {
     const output = outputs[key]
-    // Constrain the width of the description
-    const width = 80
-    let description = (output.description as string)
+    const description = (output.description as string)
       .trimRight()
       .replace(/\r\n/g, '\n') // Convert CR to LF
       .replace(/ +/g, ' ') //    Squash consecutive spaces
       .replace(/ \n/g, '\n') //  Squash space followed by newline
-	  .replace(/\n/, ' ') // Squash newlines
+      .replace(/\n/, ' ') // Squash newlines
     newReadme.push(`| \`${key}\` | ${description} |`)
   }
   newReadme.push('')
-  newReadme.push('Additionally, the `GITHUB_BASE_REF` and `GITHUB_HEAD_REF` will be')
-  newReadme.push('set to the base and head ref, after applying any fallback (i.e. when `base-ref`')
+  newReadme.push(
+    'Additionally, the `GITHUB_BASE_REF` and `GITHUB_HEAD_REF` will be'
+  )
+  newReadme.push(
+    'set to the base and head ref, after applying any fallback (i.e. when `base-ref`'
+  )
   newReadme.push('or `head-ref` properties are not defined).')
   newReadme.push('')
 

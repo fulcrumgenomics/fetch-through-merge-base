@@ -71,7 +71,7 @@ By default, the action will pull the "base ref" and "head ref" from the
 [`github` context], i.e. `${{ github.base_ref }}` and `${{ github.head_ref }}`.
 
 This means usage can be as simple adding
-`- uses: fulcrumgenomics/fetch-through-merge-base@v0` to any `pull_request` workflow:
+`- uses: fulcrumgenomics/fetch-through-merge-base@v1` to any `pull_request` workflow:
 
 ```yml
 name: Example Workflow
@@ -84,7 +84,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
-      - uses: fulcrumgenomics/fetch-through-merge-base@v0
+      - uses: fulcrumgenomics/fetch-through-merge-base@v1
       # now we've fetched commits through the merge-base of the source branch
       # and target branch of the pull request, so we can do things like:
       - run: git merge-base ${{ github.base_ref }} ${{ github.head_ref }}
@@ -110,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: fulcrumgenomics/fetch-through-merge-base@v0
+      - uses: fulcrumgenomics/fetch-through-merge-base@v1
         with:
           base-ref: main
           head-ref: ${{ github.sha }}

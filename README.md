@@ -2,9 +2,6 @@
 
 A GitHub Action for fetching PR commits through the merge-base
 
-Table of Contents
-=================
-
 * [Usage](#usage)
   * [Inputs](#inputs)
   * [Outputs](#outputs)

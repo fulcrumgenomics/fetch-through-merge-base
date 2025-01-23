@@ -2,7 +2,73 @@
 
 A GitHub Action for fetching PR commits through the merge-base
 
+Table of Contents
+=================
+
+* [Usage](#usage)
+  * [Inputs](#inputs)
+  * [Outputs](#outputs)
+* [Examples](#examples)
+* [Motivation](#motivation)
+
 ## Usage
+
+<!-- start usage -->
+
+### Inputs
+
+```yaml
+- uses: fulcrumgenomics/fetch-through-merge-base@v1
+  with:
+    # The base ref or target branch in the workflow run. If empty or not defined, the
+    # `fallback-base-ref` input ref will be used.
+    # Default: ${{ github.base_ref }}
+    base-ref: ''
+
+    # The head ref or source branch in the workflow run. If empty or not defined, the
+    # `fallback-head-ref` input ref will be used.
+    # Default: ${{ github.head_ref }}
+    head-ref: ''
+
+    # The base ref to use when `base-ref` is empty or not defined. For example, when
+    # using `github.base_ref` for `base-ref`, and the workflow is not a `pull_request`
+    # or `pull_request_target`, then the `base-ref` is not defined, so this ref will
+    # be used.
+    # Default: main
+    fallback-base-ref: ''
+
+    # The head ref to use when `head-ref` is empty or not defined. For example, when
+    # using `github.head_ref` for `head-ref`, and the workflow is not a `pull_request`
+    # or `pull_request_target`, then the `head-ref` is not defined, so this ref will
+    # be used.
+    # Default: ${{ github.sha }}
+    fallback-head-ref: ''
+
+    # The number of commits to increase from the tip of each base and ref history when
+    # `git merge-base` fails to find the common ancestor of the two commits.
+    # Default: 10
+    deepen-length: ''
+
+    # The number of attempts to deepen before the action fails.
+    # Default: 100
+    fail-after: ''
+```
+
+### Outputs
+
+| Output | Description |
+| --- | --- |
+| `base-ref` | The base ref computed by the workflow run. This differs from the input base ref when the latter is empty and the fallback base ref is used. |
+| `head-ref` | The head ref computed by the workflow run. This differs from the input head ref when the latter is empty and the fallback head ref is used. |
+
+Additionally, the `GITHUB_BASE_REF` and `GITHUB_HEAD_REF` will be
+set to the base and head ref, after applying any fallback (i.e. when `base-ref`
+or `head-ref` properties are not defined).
+
+<!-- end usage -->
+
+
+## Examples
 
 By default, the action will pull the "base ref" and "head ref" from the
 [`github` context], i.e. `${{ github.base_ref }}` and `${{ github.head_ref }}`.
@@ -53,7 +119,10 @@ jobs:
           head-ref: ${{ github.sha }}
 ```
 
-## More details
+Alternatively, fallback refs may be provided for the base and head refs with
+`fallback-base-ref` and `fallback-head-ref` respectively.
+
+## Motivation
 
 The default behavior of [`actions/checkout`] v4 is to only fetch a single commit
 because 1) often that commit is all that's needed and 2) fetching only one
@@ -69,7 +138,7 @@ The way this action works is by iteratively [deepening] the history of the
 shallow clone until the common ancestor of the pull request source branch and
 target branch (i.e. the [`merge-base`]) has been found. By default, the action
 uses `--deepen=10`, but this can be tuned through the `deepen-length` action
-input to optimize the `git fetch` calls for a given repository. The tradeoff of
+input to optimize the `git fetch` calls for a given repository. The trade-off of
 setting a large `deepen-length` is that the action may fetch more unnecessary
 commits when running on a pull request that only has a few commits. On the other
 hand, setting a small `deepen-length` may lead to many `git fetch` calls in a
@@ -80,6 +149,9 @@ Note: For small repositories, `actions/checkout` with `fetch-depth: 0` may
 finish quickly, so feel free to just use that initially. This action can be
 swapped in later when the repository has grown to the point where fetching the
 full history is slow.
+
+The `fail-after` input may be used to limit the maximum number of times additional
+commits are fetched when "deepening".
 
 [`actions/checkout`]: https://github.com/actions/checkout
 [deepening]: https://git-scm.com/docs/git-fetch#Documentation/git-fetch.txt---deepenltdepthgt

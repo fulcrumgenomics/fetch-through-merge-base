@@ -129,7 +129,7 @@ function updateUsage(
   }
   newReadme.push('')
   newReadme.push(
-    'Additionally, the `GITHUB_BASE_REF` and `GITHUB_HEAD_REF` will be'
+    'Additionally, the `GITHUB_BASE_REF` and `GITHUB_HEAD_REF` environment variables will be'
   )
   newReadme.push(
     'set to the base and head ref, after applying any fallback (i.e. when `base-ref`'

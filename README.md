@@ -58,7 +58,7 @@ A GitHub Action for fetching PR commits through the merge-base
 | `base-ref` | The base ref computed by the workflow run. This differs from the input base ref when the latter is empty and the fallback base ref is used. |
 | `head-ref` | The head ref computed by the workflow run. This differs from the input head ref when the latter is empty and the fallback head ref is used. |
 
-Additionally, the `GITHUB_BASE_REF` and `GITHUB_HEAD_REF` will be
+Additionally, the `GITHUB_BASE_REF` and `GITHUB_HEAD_REF` environment variables will be
 set to the base and head ref, after applying any fallback (i.e. when `base-ref`
 or `head-ref` properties are not defined).
 

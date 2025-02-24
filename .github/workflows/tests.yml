@@ -10,10 +10,7 @@ on:
   workflow_call:
 jobs:
   build:
-    strategy:
-      matrix:
-        os: [ubuntu-24.04, ubuntu-22.04, ubuntu-20.04, macos-14, macos-13]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/setup-node@v4
         with:
@@ -49,50 +46,43 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+    - name: Test main versus main
+      uses: ./.github/actions/testing
       with:
-        fetch-depth: 1
-    - name: Test same hash
-      uses: ./
-      with:
-        head-ref: ${{ github.sha }}
-        base-ref: ${{ github.sha }}
-    - name: Test versus main
-      uses: ./
-      with:
-        head-ref: ${{ github.sha }}
         base-ref: "main"
-    - name: Test default head-ref fallback
-      uses: ./
+        head-ref: "main"
+    - name: Test the non-fetched remote branch versus itself
+      uses: ./.github/actions/testing
+      with:
+        base-ref: "test-0001-base-ref"
+        head-ref: "test-0001-base-ref"
+    - name: Test head-ref fallback
+      uses: ./.github/actions/testing
       with:
         head-ref: ""
-        base-ref: ${{ github.sha }}
-    - name: Test default base-ref fallback
-      uses: ./
+        base-ref: "test-0001-base-ref"
+        fallback-head-ref: "test-0001-head-ref"
+    - name: Test base-ref fallback to defaults to main
+      uses: ./.github/actions/testing
       with:
-        head-ref: ${{ github.sha }}
+        head-ref: "test-0001-head-ref"
         base-ref: ""
-    - name: Get refspecs
-      id: get-refspecs
-      shell: bash
-      run: |
-        echo head-ref=$(git rev-parse HEAD) >> $GITHUB_OUTPUT
-        echo base-ref=$(git rev-parse HEAD~10) >> $GITHUB_OUTPUT
     - name: Test `fail-after` is not triggered
-      uses: ./
+      uses: ./.github/actions/testing
       with:
-        head-ref: ${{ steps.get-refspecs.outputs.head-ref }}
-        base-ref: ${{ steps.get-refspecs.outputs.base-ref }}
+        head-ref: "test-0001-base-ref"
+        base-ref: "test-0001-head-ref"
         deepen-length: 1
-        fail-after: 6
+        fail-after: 4
     - name: Test `fail-after` is triggered
       id: test_fail-after
-      uses: ./
+      uses: ./.github/actions/testing
       continue-on-error: true
       with:
-        head-ref: ${{ steps.get-refspecs.outputs.head-ref }}
-        base-ref: ${{ steps.get-refspecs.outputs.base-ref }}
+        head-ref: "test-0001-base-ref"
+        base-ref: "test-0001-head-ref"
         deepen-length: 1
-        fail-after: 5
+        fail-after: 3
     - name: Check failures
       shell: bash
       run: |

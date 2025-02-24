@@ -1,5 +1,6 @@
 #!/bin/sh
 
+
 DEEPEN_LENGTH=${DEEPEN_LENGTH:-10}
 FAIL_AFTER=${FAIL_AFTER:-1000}
 
@@ -20,17 +21,18 @@ if [ -z "${FAIL_AFTER}" ]; then
   exit 1;
 fi
 
-set +x
+set -x
+set -eou pipefail
 
 # fetch the references and track them in temporary branches.  Hopefully there are no collisions!
-git fetch --quiet --progress --depth=1 origin "$GITHUB_BASE_REF:__github_base_ref__";
-git fetch --quiet --progress --depth=1 origin "$GITHUB_HEAD_REF:__github_head_ref__";
+git fetch --progress --depth=1 origin "$GITHUB_BASE_REF:__github_base_ref__";
+git fetch --progress --depth=1 origin "$GITHUB_HEAD_REF:__github_head_ref__";
 
 # keep fetching deeper until we find the common ancestor reference
 while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; do
   # fetch deeper
-  git fetch --quiet --deepen="$DEEPEN_LENGTH" origin "$GITHUB_HEAD_REF";
-  git fetch --quiet --deepen="$DEEPEN_LENGTH" origin "$GITHUB_BASE_REF";
+  git fetch --deepen="$DEEPEN_LENGTH" origin "$GITHUB_HEAD_REF";
+  git fetch --deepen="$DEEPEN_LENGTH" origin "$GITHUB_BASE_REF";
   # check if we are done iterating
   let FAIL_AFTER="FAIL_AFTER-1";
   if [ "$FAIL_AFTER" -le 0 ]; then

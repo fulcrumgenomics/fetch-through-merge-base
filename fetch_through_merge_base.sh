@@ -37,7 +37,11 @@ while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; 
   let FAIL_AFTER="FAIL_AFTER-1";
   if [ "$FAIL_AFTER" -le 0 ]; then
     echo "Failed to find the common ancestors of GITHUB_BASE_REF=${GITHUB_BASE_REF} and GITHUB_HEAD_REF=${GITHUB_HEAD_REF}";
-    exit 1;
+    if [[ "$FALLBACK_FETCH_ALL" == "false" ]]; then
+      exit 1;
+    fi
+    echo "Falling back to fetching all references";
+    git fetch --all;
   else
     echo "Deepend search by ${DEEPEN_LENGTH}, ${FAIL_AFTER} iterations remaining...";
   fi

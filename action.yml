@@ -50,6 +50,12 @@ inputs:
     required: false
     description: >
       The working directory to switch to when runnign this action.
+  fallback-fetch-all:
+    default: false
+    required: false
+    description: >
+      True to fetch all commits if number of attempts to deepen reaches 
+      its limit, false to fail the action.
 outputs:
   base-ref:
     description: >
@@ -76,6 +82,7 @@ runs:
         DEEPEN_LENGTH: ${{ inputs.deepen-length }}
         FAIL_AFTER: ${{ inputs.fail-after }}
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
+        FALLBACK_FETCH_ALL: ${{ inputs.fallback-fetch-all }}
       run: |
         set +x
         cd $WORKING_DIRECTORY;

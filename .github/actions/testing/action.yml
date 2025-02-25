@@ -45,6 +45,12 @@ inputs:
     required: false
     description: >
       The number of attempts to deepen before the action fails.
+  fallback-fetch-all:
+    default: false
+    required: false
+    desecription: >
+      True to fetch all commits if number of attempts to deepen reaches 
+      its limit, false to fail the action.
 runs:
   using: "composite"
   steps: 
@@ -66,6 +72,7 @@ runs:
         deepen-length: ${{ inputs.deepen-length }}
         fail-after: ${{ inputs.fail-after }}
         working-directory: ./__testing_dir__
+        fallback-fetch-all: ${{ inputs.fallback-fetch-all }}
     - name: cleanup the testing directory
       shell: bash
       run: rm -rf __testing_dir__

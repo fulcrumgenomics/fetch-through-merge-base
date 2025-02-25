@@ -83,6 +83,14 @@ jobs:
         base-ref: "test-0001-head-ref"
         deepen-length: 1
         fail-after: 3
+    - name: Test `fallback-fetch-all`
+      uses: ./.github/actions/testing
+      with:
+        head-ref: "test-0001-base-ref"
+        base-ref: "test-0001-head-ref"
+        deepen-length: 1
+        fail-after: 3
+        fallback-fetch-all: true
     - name: Check failures
       shell: bash
       run: |

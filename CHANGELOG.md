@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.1.1] (2024-02-25)
+
+- Fix: infinite loop after fetching all (#19)
+
+[v1.1.1]: https://github.com/fulcrumgenomics/setup-latch/releases/tag/v1.1.1
+
 ## [v1.1.0] (2024-02-24)
 
 - Feature: add the fallback-fetch-all parameter (#18)

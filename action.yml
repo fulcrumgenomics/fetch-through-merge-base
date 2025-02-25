@@ -45,6 +45,11 @@ inputs:
     required: false
     description: >
       The number of attempts to deepen before the action fails.
+  working-directory:
+    default: ./
+    required: false
+    description: >
+      The working directory to switch to when runnign this action.
 outputs:
   base-ref:
     description: >
@@ -70,8 +75,10 @@ runs:
         FALLBACK_HEAD_REF: ${{ inputs.fallback-head-ref }}
         DEEPEN_LENGTH: ${{ inputs.deepen-length }}
         FAIL_AFTER: ${{ inputs.fail-after }}
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
       run: |
         set +x
+        cd $WORKING_DIRECTORY;
         if [ -z "$BASE_REF" ] ; then
             export GITHUB_BASE_REF="$FALLBACK_BASE_REF"
         else

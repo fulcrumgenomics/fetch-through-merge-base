@@ -58,6 +58,10 @@ A GitHub Action for fetching PR commits through the merge-base
     # The number of attempts to deepen before the action fails.
     # Default: 100
     fail-after: ''
+
+    # The working directory to switch to when runnign this action.
+    # Default: ./
+    working-directory: ''
 ```
 
 ### Outputs

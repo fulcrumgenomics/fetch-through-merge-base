@@ -43,6 +43,7 @@ while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; 
     fi
     echo "Falling back to fetching all references";
     git fetch --quiet --all;
+    break;
   else
     echo "Deepend search by ${DEEPEN_LENGTH}, ${FAIL_AFTER} iterations remaining...";
   fi

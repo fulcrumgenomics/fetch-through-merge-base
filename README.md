@@ -62,6 +62,11 @@ A GitHub Action for fetching PR commits through the merge-base
     # The working directory to switch to when runnign this action.
     # Default: ./
     working-directory: ''
+
+    # True to fetch all commits if number of attempts to deepen reaches its limit,
+    # false to fail the action.
+    # Default: false
+    fallback-fetch-all: ''
 ```
 
 ### Outputs

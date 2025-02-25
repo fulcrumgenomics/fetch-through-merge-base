@@ -33,7 +33,9 @@ while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; 
   git fetch  --quiet --deepen="$DEEPEN_LENGTH" origin "$GITHUB_HEAD_REF";
   git fetch  --quiet --deepen="$DEEPEN_LENGTH" origin "$GITHUB_BASE_REF";
   # check if we are done iterating
+  set +e;
   let FAIL_AFTER="FAIL_AFTER-1";
+  set -e;
   if [ "$FAIL_AFTER" -le 0 ]; then
     echo "Failed to find the common ancestors of GITHUB_BASE_REF=${GITHUB_BASE_REF} and GITHUB_HEAD_REF=${GITHUB_HEAD_REF}";
     if [[ "$FALLBACK_FETCH_ALL" == "false" ]]; then

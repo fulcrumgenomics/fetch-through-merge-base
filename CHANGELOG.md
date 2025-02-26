@@ -1,10 +1,16 @@
 # Changelog
 
+## [v1.2.1] (2024-02-26)
+
+- Feature: ungraft any commits (#20). This is important when using with GitHub pull request commits which can be grafted.
+
+[v1.2.1]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.2.1
+
 ## [v1.1.1] (2024-02-25)
 
 - Fix: infinite loop after fetching all (#19)
 
-[v1.1.1]: https://github.com/fulcrumgenomics/setup-latch/releases/tag/v1.1.1
+[v1.1.1]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.1.1
 
 ## [v1.1.0] (2024-02-24)
 
@@ -20,19 +26,19 @@
 - Bump eslint-plugin-github from 4.10.2 to 5.1.5 (#4)
 - Bump @types/node from 20.17.15 to 22.10.8 (#2)
 
-[v1.1.0]: https://github.com/fulcrumgenomics/setup-latch/releases/tag/v1.1.0
+[v1.1.0]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.1.0
 
 ## [v1.0.1] (2024-01-22)
 
 - Add script to update the README docs; updated the README docs (#1)
 
-[v1.0.1]: https://github.com/fulcrumgenomics/setup-latch/releases/tag/v1.0.1
+[v1.0.1]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.0.1
 
 ## [v1.0.0] (2024-01-22)
 
 - first official release!
 
-[v1.0.0]: https://github.com/fulcrumgenomics/setup-latch/releases/tag/v1.0.0
+[v1.0.0]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.0.0
 
 ## 0.4.0
 

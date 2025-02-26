@@ -104,4 +104,4 @@ runs:
         echo "GITHUB_HEAD_REF=$GITHUB_HEAD_REF"
         export GITHUB_BASE_REF
         export GITHUB_HEAD_REF
-        bash ${{ github.action_path }}/fetch_through_merge_base.sh        
+        bash ${{ github.action_path }}/src/scripts/fetch_through_merge_base.sh        

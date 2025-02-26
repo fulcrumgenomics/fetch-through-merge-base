@@ -73,7 +73,7 @@ jobs:
         head-ref: "test-0001-base-ref"
         base-ref: "test-0001-head-ref"
         deepen-length: 1
-        fail-after: 4
+        fail-after: 3
     - name: Test `fail-after` is triggered
       id: test_fail-after
       uses: ./.github/actions/testing
@@ -82,14 +82,14 @@ jobs:
         head-ref: "test-0001-base-ref"
         base-ref: "test-0001-head-ref"
         deepen-length: 1
-        fail-after: 3
+        fail-after: 2
     - name: Test `fallback-fetch-all`
       uses: ./.github/actions/testing
       with:
         head-ref: "test-0001-base-ref"
         base-ref: "test-0001-head-ref"
         deepen-length: 1
-        fail-after: 3
+        fail-after: 2
         fallback-fetch-all: true
     - name: Check failures
       shell: bash

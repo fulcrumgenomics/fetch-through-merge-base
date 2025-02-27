@@ -48,9 +48,15 @@ inputs:
   fallback-fetch-all:
     default: false
     required: false
-    desecription: >
+    description: >
       True to fetch all commits if number of attempts to deepen reaches 
       its limit, false to fail the action.
+  ancestor-ref:
+    default: ""
+    required: false
+    description: >
+      The best common ancestor between the base and head references,
+      or empty if none was found.
 runs:
   using: "composite"
   steps: 
@@ -76,10 +82,23 @@ runs:
     - name: cleanup the testing directory
       shell: bash
       run: rm -rf __testing_dir__
-    - name: Check failure
+    - name: Check ancestor-ref
       shell: bash
       run: |
-        if [[ ${{ steps.the-test.outcome }} == "failure" ]]; then
-          echo "Test failed";
+        if [[ "${{ inputs.ancestor-ref }}" == "" ]]; then
+          if [[ "${{ steps.the-test.outcome }}" != "failure" ]]; then
+            echo "Error: test did not fail when input ancestor-ref was empty";
+            exit 1;
+          fi
+        else
+          if [[ "${{ steps.the-test.outcome }}" == "failure" ]]; then
+            echo "Error: test failed when input ancestor-ref was not empty";
+            exit 1;
+          fi
+        fi
+        if [[ "${{ steps.the-test.outputs.ancestor-ref }}" != "${{ inputs.ancestor-ref }}" ]]; then
+          echo "Error: ancestor-ref mismatch";
+          echo "  expected: [${{ inputs.ancestor-ref }}]";
+          echo "  actual:   [${{ steps.the-test.outputs.ancestor-ref }}]";
           exit 1;
         fi

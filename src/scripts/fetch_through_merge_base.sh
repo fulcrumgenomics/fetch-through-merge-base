@@ -25,7 +25,15 @@ fi
 
 set -eou pipefail
 
-# fetch the references and track them in temporary branches.  Hopefully there are no collisions!
+# Fetch a branch or tag, and track it.  Do not fetch if a commit (yet).
+if [[ "${GITHUB_BASE_REF}" != "$(git rev-parse --verify ${GITHUB_BASE_REF})" ]]; then
+    git fetch --update-head-ok --progress --quiet --depth=1 origin "$GITHUB_BASE_REF:$GITHUB_BASE_REF";
+fi
+if [[ "${GITHUB_HEAD_REF}" != "$(git rev-parse --verify ${GITHUB_HEAD_REF})" ]]; then
+    git fetch --update-head-ok --progress --quiet --depth=1 origin "$GITHUB_HEAD_REF:$GITHUB_HEAD_REF";
+fi
+
+# Fetch the references and track them in temporary branches.  Hopefully there are no collisions!
 git fetch --progress --quiet --depth=1 origin "$GITHUB_BASE_REF:__github_base_ref__";
 git fetch --progress --quiet --depth=1 origin "$GITHUB_HEAD_REF:__github_head_ref__";
 GITHUB_BASE_REF=$(git rev-parse "__github_base_ref__");

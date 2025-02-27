@@ -51,29 +51,42 @@ jobs:
       with:
         base-ref: "main"
         head-ref: "main"
+        ancestor-ref: "6eb785672d2c6770af9e985d36ddcd1b3a285f8e"
     - name: Test the non-fetched remote branch versus itself
       uses: ./.github/actions/testing
       with:
         base-ref: "test-0001-base-ref"
         head-ref: "test-0001-base-ref"
+        ancestor-ref: "184170635f898a6d9ec476a9ea9f0f7fdefb4f64"
     - name: Test head-ref fallback
       uses: ./.github/actions/testing
       with:
         head-ref: ""
         base-ref: "test-0001-base-ref"
         fallback-head-ref: "test-0001-head-ref"
+        ancestor-ref: "6eb785672d2c6770af9e985d36ddcd1b3a285f8e"
     - name: Test base-ref fallback to defaults to main
       uses: ./.github/actions/testing
       with:
         head-ref: "test-0001-head-ref"
         base-ref: ""
-    - name: Test `fail-after` is not triggered
+        ancestor-ref: "6eb785672d2c6770af9e985d36ddcd1b3a285f8e"
+    - name: Test `fail-after` is not triggered (branches)
       uses: ./.github/actions/testing
       with:
         head-ref: "test-0001-base-ref"
         base-ref: "test-0001-head-ref"
         deepen-length: 1
         fail-after: 3
+        ancestor-ref: "6eb785672d2c6770af9e985d36ddcd1b3a285f8e"
+    - name: Test `fail-after` is not triggered (sha1)
+      uses: ./.github/actions/testing
+      with:
+        head-ref: "184170635f898a6d9ec476a9ea9f0f7fdefb4f64"
+        base-ref: "e649b76f3085b2364ab2a834e43ae6fd74a33fa9"
+        deepen-length: 1
+        fail-after: 3
+        ancestor-ref: "6eb785672d2c6770af9e985d36ddcd1b3a285f8e"
     - name: Test `fail-after` is triggered
       id: test_fail-after
       uses: ./.github/actions/testing
@@ -83,6 +96,7 @@ jobs:
         base-ref: "test-0001-head-ref"
         deepen-length: 1
         fail-after: 2
+        ancestor-ref: ""
     - name: Test `fallback-fetch-all`
       uses: ./.github/actions/testing
       with:
@@ -91,10 +105,4 @@ jobs:
         deepen-length: 1
         fail-after: 2
         fallback-fetch-all: true
-    - name: Check failures
-      shell: bash
-      run: |
-        if [[ ${{ steps.test_fail-after.outcome }} != "failure" ]]; then
-          echo "Test fail-after failed";
-          exit 1;
-        fi
+        ancestor-ref: "6eb785672d2c6770af9e985d36ddcd1b3a285f8e"

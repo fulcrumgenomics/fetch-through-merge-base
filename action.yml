@@ -69,6 +69,11 @@ outputs:
       input head ref when the latter is empty and the fallback head ref
       is used.
     value: ${{ steps.fetch_through_merge_base.outputs.head-ref }}
+  ancestor-ref:
+    description: >
+      The best common ancestor between the base and head references,
+      or empty if none was found.
+    value: ${{ steps.finalize.outputs.ancestor-ref }}
 runs:
   using: "composite"
   steps: 
@@ -105,3 +110,15 @@ runs:
         export GITHUB_BASE_REF
         export GITHUB_HEAD_REF
         bash ${{ github.action_path }}/src/scripts/fetch_through_merge_base.sh        
+    - id: finalize
+      if: always()
+      shell: bash
+      env:
+        BASE_REF: ${{ steps.fetch_through_merge_base.outputs.base-ref }}
+        HEAD_REF: ${{ steps.fetch_through_merge_base.outputs.head-ref }}
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+      run: |
+        cd $WORKING_DIRECTORY;
+        ancestor_ref="$(git merge-base $BASE_REF $HEAD_REF)";
+        echo "ancestor-ref=${ancestor_ref}" >> $GITHUB_OUTPUT
+        echo ${ancestor_ref}

@@ -1,5 +1,12 @@
 # Changelog
 
+## [v1.3.0] (2024-02-26)
+
+- Feature: update and unshallow when fetching (#21)
+- CI: improve testing (#22)
+
+[v1.3.0]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.3.0
+
 ## [v1.2.1] (2024-02-26)
 
 - Feature: ungraft any commits (#20). This is important when using with GitHub pull request commits which can be grafted.

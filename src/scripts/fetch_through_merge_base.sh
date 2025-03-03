@@ -25,6 +25,14 @@ fi
 
 set -eou pipefail
 
+function git_fetch_parents() {
+    local sha1=${1};
+    for parent_sha1 in $(git cat-file -p "${sha1}" | grep '^parent' | cut -f 2 -d ' '); do
+        git fetch --update-head-ok --update-shallow --progress --quiet --depth=1 origin "${parent_sha1}:__github_parent__";
+        git branch -D __github_parent__;
+    done
+}
+
 # Fetch a branch or tag, and track it.  Do not fetch if a commit (yet).
 if [[ "${GITHUB_BASE_REF}" != "$(git rev-parse --verify ${GITHUB_BASE_REF})" ]]; then
     git fetch --update-head-ok --update-shallow --progress --quiet --depth=1 origin "$GITHUB_BASE_REF:$GITHUB_BASE_REF";
@@ -39,11 +47,16 @@ git fetch --progress --quiet --depth=1 --update-shallow origin "$GITHUB_HEAD_REF
 GITHUB_BASE_REF=$(git rev-parse "__github_base_ref__");
 GITHUB_HEAD_REF=$(git rev-parse "__github_head_ref__");
 
+# For merge commits we need to fetch both parents (e.g. from GitHub PRs)
+git_fetch_parents "${GITHUB_BASE_REF}";
+git_fetch_parents "${GITHUB_HEAD_REF}";
+python ${SCRIPT_DIR}/git_ungraft.py;
+
 # keep fetching deeper until we find the common ancestor reference
 while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; do
   # fetch deeper
-  git fetch  --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_HEAD_REF";
-  git fetch  --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_BASE_REF";
+  git fetch --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_HEAD_REF";
+  git fetch --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_BASE_REF";
   python ${SCRIPT_DIR}/git_ungraft.py;
   # check if we are done iterating
   set +e;

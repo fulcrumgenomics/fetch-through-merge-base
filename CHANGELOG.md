@@ -1,25 +1,31 @@
 # Changelog
 
-## [v1.3.0] (2024-02-26)
+## [v1.4.0] (2025-03-03)
+
+- Feature: improve fallback when the fetch script fails (#26)
+
+[v1.4.0]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.4.0
+
+## [v1.3.0] (2025-02-26)
 
 - Feature: update and unshallow when fetching (#21)
 - CI: improve testing (#22)
 
 [v1.3.0]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.3.0
 
-## [v1.2.1] (2024-02-26)
+## [v1.2.1] (2025-02-26)
 
 - Feature: ungraft any commits (#20). This is important when using with GitHub pull request commits which can be grafted.
 
 [v1.2.1]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.2.1
 
-## [v1.1.1] (2024-02-25)
+## [v1.1.1] (2025-02-25)
 
 - Fix: infinite loop after fetching all (#19)
 
 [v1.1.1]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.1.1
 
-## [v1.1.0] (2024-02-24)
+## [v1.1.0] (2025-02-24)
 
 - Feature: add the fallback-fetch-all parameter (#18)
 - Feature: add the working-directory parameter (#17)
@@ -35,13 +41,13 @@
 
 [v1.1.0]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.1.0
 
-## [v1.0.1] (2024-01-22)
+## [v1.0.1] (2025-01-22)
 
 - Add script to update the README docs; updated the README docs (#1)
 
 [v1.0.1]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.0.1
 
-## [v1.0.0] (2024-01-22)
+## [v1.0.0] (2025-01-22)
 
 - first official release!
 

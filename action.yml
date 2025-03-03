@@ -78,6 +78,7 @@ runs:
   using: "composite"
   steps: 
     - id: fetch_through_merge_base
+      continue-on-error: true
       shell: bash
       env:
         BASE_REF: ${{ inputs.base-ref }}
@@ -110,6 +111,23 @@ runs:
         export GITHUB_BASE_REF
         export GITHUB_HEAD_REF
         bash ${{ github.action_path }}/src/scripts/fetch_through_merge_base.sh        
+    - id: fallback 
+      if: ${{ steps.fetch_through_merge_base.conclusion == 'failure' && inputs.fallback-fetch-all }}
+      shell: bash
+      env:
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+      run: |
+        cd $WORKING_DIRECTORY;
+        git fetch --all --unshallow;
+        python ${{ github.action_path }}/src/scripts/git_ungraft.py;
+    - id: check_for_failure
+      if: ${{ steps.fetch_through_merge_base.conclusion == 'failure' }} 
+      shell: bash
+      env:
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+      run: |
+        echo "Action failed!"
+        exit 1
     - id: finalize
       if: always()
       shell: bash

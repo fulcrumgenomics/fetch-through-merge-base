@@ -33,6 +33,8 @@ export default [...compat.extends("plugin:github/recommended"), {
         },
     },
 
+	files: ['src/misc/*ts'],
+
     rules: {
         "eslint-comments/no-use": "off",
         "import/no-namespace": "off",

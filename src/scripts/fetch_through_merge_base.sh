@@ -29,7 +29,7 @@ set -x
 function git_fetch_parents() {
     local sha1=${1};
     for parent in $(git cat-file -p "${sha1}" | grep '^parent' | tail -n 1 | cut -f 2 -d ' '); do
-        git fetch --progress --quiet --depth=1 --update-shallow origin "$GITHUB_BASE_REF:__github_parent__";
+        git fetch --update-head-ok --update-shallow --progress --depth=1 origin "${sha1}:__github_parent__";
         git branch -D __github_parent__;
     done
 }
@@ -51,6 +51,7 @@ GITHUB_HEAD_REF=$(git rev-parse "__github_head_ref__");
 # For merge commits we need to fetch both parents  (e.g. from GitHub PRs)
 git_fetch_parents "${GITHUB_BASE_REF}";
 git_fetch_parents "${GITHUB_HEAD_REF}";
+python ${SCRIPT_DIR}/git_ungraft.py;
 
 # keep fetching deeper until we find the common ancestor reference
 while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; do

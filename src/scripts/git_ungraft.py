@@ -178,7 +178,8 @@ def _main(args: argparse.Namespace) -> None:
         remaining = [c for c in grafted if c not in candidates]
         if set(grafted) != set(remaining):
             with open(repo.gitdir/"shallow", "w", encoding="utf-8") as shallow:
-                shallow.writelines(remaining)
+                for line in remaining:
+                    shallow.write(f"{line}\n")
 
     prefix = "Would ungraft " if args.dry_run else "Ungrafted "
     for item in candidates:

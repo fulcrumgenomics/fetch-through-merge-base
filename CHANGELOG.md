@@ -1,5 +1,12 @@
 # Changelog
 
+## [v1.4.1] (2025-03-03)
+
+    - Fix: ungraft did not add newlines to .git/shallow
+    - Fix: try fetching the parent commits in case of a merge commit
+
+[v1.4.1]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.4.1
+
 ## [v1.4.0] (2025-03-03)
 
 - Feature: improve fallback when the fetch script fails (#26)

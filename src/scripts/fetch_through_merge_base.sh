@@ -26,6 +26,14 @@ fi
 set -eou pipefail
 set -x
 
+function git_fetch_parents() {
+    local sha1=${1};
+    for parent in $(git cat-file -p "${sha1}" | grep '^parent' | tail -n 1 | cut -f 2 -d ' '); do
+        git fetch --progress --quiet --depth=1 --update-shallow origin "$GITHUB_BASE_REF:__github_parent__";
+        git branch -D __github_parent__;
+    done
+}
+
 # Fetch a branch or tag, and track it.  Do not fetch if a commit (yet).
 if [[ "${GITHUB_BASE_REF}" != "$(git rev-parse --verify ${GITHUB_BASE_REF})" ]]; then
     git fetch --update-head-ok --update-shallow --progress --depth=1 origin "$GITHUB_BASE_REF:$GITHUB_BASE_REF";
@@ -39,6 +47,10 @@ git fetch --progress --depth=1 --update-shallow origin "$GITHUB_BASE_REF:__githu
 git fetch --progress --depth=1 --update-shallow origin "$GITHUB_HEAD_REF:__github_head_ref__";
 GITHUB_BASE_REF=$(git rev-parse "__github_base_ref__");
 GITHUB_HEAD_REF=$(git rev-parse "__github_head_ref__");
+
+# For merge commits we need to fetch both parents  (e.g. from GitHub PRs)
+git_fetch_parents "${GITHUB_BASE_REF}";
+git_fetch_parents "${GITHUB_HEAD_REF}";
 
 # keep fetching deeper until we find the common ancestor reference
 while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; do

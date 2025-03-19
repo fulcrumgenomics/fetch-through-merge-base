@@ -116,26 +116,33 @@ runs:
         export GITHUB_BASE_REF
         export GITHUB_HEAD_REF
         echo "::endgroup::"
+        set -euo pipefail
         bash ${{ github.action_path }}/src/scripts/fetch_through_merge_base.sh        
-    - id: fallback 
-      if: ${{ steps.fetch_through_merge_base.conclusion == 'failure' && inputs.fallback-fetch-all }}
-      shell: bash
-      env:
-        WORKING_DIRECTORY: ${{ inputs.working-directory }}
-      run: |
-        echo "::group::Falling back to fetching all...🚦"
-        cd $WORKING_DIRECTORY;
-        git fetch --all --unshallow;
-        python ${{ github.action_path }}/src/scripts/git_ungraft.py;
-        echo "::endgroup::"
+    # Note: `outcome` does not consider `continue-on-error`
+    # Note: fallback-fetch-all is a string, not a boolean, since type is not supported
+    # for inputs on composite actions (only workflows).
     - id: check_for_failure
-      if: ${{ steps.fetch_through_merge_base.conclusion == 'failure' }} 
+      if: ${{ steps.fetch_through_merge_base.outcome == 'failure' && inputs.fallback-fetch-all == 'false' }}
       shell: bash
       env:
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
       run: |
         echo "Action failed! ❌"
         exit 1
+    - id: fallback 
+      if: ${{ steps.fetch_through_merge_base.outcome == 'failure' && inputs.fallback-fetch-all == 'true' }}
+      shell: bash
+      env:
+        BASE_REF: ${{ steps.fetch_through_merge_base.outputs.base-ref }}
+        HEAD_REF: ${{ steps.fetch_through_merge_base.outputs.head-ref }}
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+      run: |
+        echo "::group::Falling back to fetching all...🚦"
+        cd $WORKING_DIRECTORY;
+        git fetch --all --unshallow --verbose;
+        python ${{ github.action_path }}/src/scripts/git_ungraft.py;
+        echo -n "Verifying merge-base: "
+        git merge-base $BASE_REF $HEAD_REF
     - id: finalize
       if: always()
       shell: bash
@@ -148,6 +155,7 @@ runs:
         cd $WORKING_DIRECTORY;
         ancestor_ref="$(git merge-base $BASE_REF $HEAD_REF)";
         echo "ancestor-ref=${ancestor_ref}" >> $GITHUB_OUTPUT
-        echo ${ancestor_ref}
         echo "::endgroup::"
+        echo "Merge base is:"
+        echo ${ancestor_ref}
         echo "Action succeeded! ✅"

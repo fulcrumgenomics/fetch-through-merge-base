@@ -90,7 +90,6 @@ jobs:
     - name: Test `fail-after` is triggered
       id: test_fail-after
       uses: ./.github/actions/testing
-      continue-on-error: true
       with:
         head-ref: "test-0001-base-ref"
         base-ref: "test-0001-head-ref"

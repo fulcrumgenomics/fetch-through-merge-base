@@ -184,6 +184,8 @@ def _main(args: argparse.Namespace) -> None:
     prefix = "Would ungraft " if args.dry_run else "Ungrafted "
     for item in candidates:
         print(prefix + item)
+    if 0 == len(candidates):
+        print("No candidate commits to ungrafft")
 
 def _parse_args(args: List[str]) -> argparse.Namespace:
     _log.debug("Parsing args: %s", args)

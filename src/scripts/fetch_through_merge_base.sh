@@ -56,11 +56,7 @@ python ${SCRIPT_DIR}/git_ungraft.py;
 
 # keep fetching deeper until we find the common ancestor reference
 while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; do
-  # fetch deeper
-  git fetch --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_HEAD_REF";
-  git fetch --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_BASE_REF";
-  python ${SCRIPT_DIR}/git_ungraft.py;
-  # check if we are done iterating
+ # check if we are done iterating
   set +e;
   let FAIL_AFTER="FAIL_AFTER-1";
   set -e;
@@ -69,11 +65,14 @@ while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; 
     echo "Failure! ❌"
     echo "::endgroup::"
     exit 1;
-  else
-    echo "Deepend search by ${DEEPEN_LENGTH}‼️";
-    echo "::endgroup::"
-    echo "::group::Attempts remaining: ${FAIL_AFTER} 🚦"
   fi
+  # fetch deeper
+  git fetch --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_HEAD_REF";
+  git fetch --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_BASE_REF";
+  python ${SCRIPT_DIR}/git_ungraft.py;
+  echo "Deepend search by ${DEEPEN_LENGTH}‼️";
+  echo "::endgroup::"
+  echo "::group::Attempts remaining: ${FAIL_AFTER} 🚦"
 done
 
 echo "Success! ✅"

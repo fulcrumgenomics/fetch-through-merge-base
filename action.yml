@@ -77,6 +77,11 @@ outputs:
 runs:
   using: "composite"
   steps: 
+    - id: print-banner
+      name: Print Banner
+      shell: bash
+      run: |
+        cat ${GITHUB_ACTION_PATH}/src/misc/banner.txt
     - id: fetch_through_merge_base
       continue-on-error: true
       shell: bash
@@ -90,7 +95,7 @@ runs:
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
         FALLBACK_FETCH_ALL: ${{ inputs.fallback-fetch-all }}
       run: |
-        set +x
+        echo "::group::Setting up environment variables...🚦"
         cd $WORKING_DIRECTORY;
         if [ -z "$BASE_REF" ] ; then
             export GITHUB_BASE_REF="$FALLBACK_BASE_REF"
@@ -110,6 +115,7 @@ runs:
         echo "GITHUB_HEAD_REF=$GITHUB_HEAD_REF"
         export GITHUB_BASE_REF
         export GITHUB_HEAD_REF
+        echo "::endgroup::"
         bash ${{ github.action_path }}/src/scripts/fetch_through_merge_base.sh        
     - id: fallback 
       if: ${{ steps.fetch_through_merge_base.conclusion == 'failure' && inputs.fallback-fetch-all }}
@@ -117,16 +123,18 @@ runs:
       env:
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
       run: |
+        echo "::group::Falling back to fetching all...🚦"
         cd $WORKING_DIRECTORY;
         git fetch --all --unshallow;
         python ${{ github.action_path }}/src/scripts/git_ungraft.py;
+        echo "::endgroup::"
     - id: check_for_failure
       if: ${{ steps.fetch_through_merge_base.conclusion == 'failure' }} 
       shell: bash
       env:
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
       run: |
-        echo "Action failed!"
+        echo "Action failed! ❌"
         exit 1
     - id: finalize
       if: always()
@@ -136,7 +144,10 @@ runs:
         HEAD_REF: ${{ steps.fetch_through_merge_base.outputs.head-ref }}
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
       run: |
+        echo "::group::Getting merge-base (ancestor-ref)...🚦"
         cd $WORKING_DIRECTORY;
         ancestor_ref="$(git merge-base $BASE_REF $HEAD_REF)";
         echo "ancestor-ref=${ancestor_ref}" >> $GITHUB_OUTPUT
         echo ${ancestor_ref}
+        echo "::endgroup::"
+        echo "Action succeeded! ✅"

@@ -6,6 +6,8 @@ FAIL_AFTER=${FAIL_AFTER:-1000}
 
 SCRIPT_DIR=$(dirname ${BASH_SOURCE[0]});
 
+echo "::group::Attempts remaining: ${FAIL_AFTER} 🚦"
+
 if [ -z "${GITHUB_HEAD_REF}" ]; then
   echo "Empty GITHUB_HEAD_REF!";
   exit 1;
@@ -64,11 +66,18 @@ while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; 
   set -e;
   if [ "$FAIL_AFTER" -le 0 ]; then
     echo "Failed to find the common ancestors of GITHUB_BASE_REF=${GITHUB_BASE_REF} and GITHUB_HEAD_REF=${GITHUB_HEAD_REF}";
+    echo "Failure! ❌"
+    echo "::endgroup::"
     exit 1;
   else
-    echo "Deepend search by ${DEEPEN_LENGTH}, ${FAIL_AFTER} iterations remaining...";
+    echo "Deepend search by ${DEEPEN_LENGTH}‼️";
+    echo "::endgroup::"
+    echo "::group::Attempts remaining: ${FAIL_AFTER} 🚦"
   fi
 done
 
+echo "Success! ✅"
+
 # cleanup
 git branch -D __github_base_ref__ __github_head_ref__;
+echo "::endgroup::"

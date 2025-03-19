@@ -1,5 +1,8 @@
 # fetch-through-merge-base
 
+[![Tests](https://github.com/fulcrumgenomics/fetch-through-merge-base/actions/workflows/tests.yml/badge.svg)](https://github.com/fulcrumgenomics/fetch-through-merge-base/actions/workflows/tests.yml)
+[![License](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/fulcrumgenomics/fetch-through-merge-base/blob/main/LICENSE)
+
 A GitHub Action for fetching PR commits through the merge-base
 
 * [Usage](#usage)

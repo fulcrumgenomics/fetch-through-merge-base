@@ -1,9 +1,20 @@
 # Changelog
 
+## [v1.4.2] (2025-03-19)
+
+- [#31] Fix `fail-after` number of iterations and related tests
+- [#31] Fix `fallback-fetch-all` could never be reached
+- [#30] Add badges to the README, and add a banner and beautify the logs 
+- [#30] Add badges to the README, and add a banner and beautify the logs 
+- Fix website link in README
+- [#23] Bump the minor-npm-dependencies group across 1 directory with 3 updates
+
+[v1.4.2]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.4.2
+
 ## [v1.4.1] (2025-03-03)
 
-    - Fix: ungraft did not add newlines to .git/shallow
-    - Fix: try fetching the parent commits in case of a merge commit
+- Fix: ungraft did not add newlines to .git/shallow
+- Fix: try fetching the parent commits in case of a merge commit
 
 [v1.4.1]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.4.1
 

@@ -139,12 +139,12 @@ runs:
         HEAD_REF: ${{ steps.fetch_through_merge_base.outputs.head-ref }}
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
       run: |
-        gha-time start --name "Falling back to fetching all...🚦"
+        gha-timer start --name "Falling back to fetching all...🚦"
         cd $WORKING_DIRECTORY;
         git fetch --all --unshallow --verbose;
         python ${{ github.action_path }}/src/scripts/git_ungraft.py;
         echo -n "Verifying merge-base: "
-        gha-time elapsed --outcome success --name "Falling back to fetching all...🚦"
+        gha-timer elapsed --outcome success --name "Falling back to fetching all...🚦"
         git merge-base $BASE_REF $HEAD_REF
     - id: finalize
       if: always()

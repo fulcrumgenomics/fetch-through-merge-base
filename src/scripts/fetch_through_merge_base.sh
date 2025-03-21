@@ -61,7 +61,7 @@ while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; 
   let FAIL_AFTER="FAIL_AFTER-1";
   set -e;
   if [ "$FAIL_AFTER" -le 0 ]; then
-    gha-timer stop --outcome failure
+    gha-timer elapsed --outcome failure
     echo "Failed to find the common ancestors of GITHUB_BASE_REF=${GITHUB_BASE_REF} and GITHUB_HEAD_REF=${GITHUB_HEAD_REF}";
     echo "Failure! ❌"
     exit 1;
@@ -71,12 +71,12 @@ while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; 
   git fetch --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_BASE_REF";
   python ${SCRIPT_DIR}/git_ungraft.py;
   echo "Deepend search by ${DEEPEN_LENGTH}‼️";
-  gha-timer stop --outcome skipped
+  gha-timer elapsed --outcome skipped
   gha-timer start --name "Attempts remaining: ${FAIL_AFTER} 🚦"
 done
 
 
 # cleanup
 git branch -D __github_base_ref__ __github_head_ref__;
-gha-timer stop --outcome success
+gha-timer elapsed --outcome success
 echo "Success! ✅"

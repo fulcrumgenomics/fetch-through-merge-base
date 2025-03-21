@@ -144,7 +144,7 @@ runs:
         git fetch --all --unshallow --verbose;
         python ${{ github.action_path }}/src/scripts/git_ungraft.py;
         echo -n "Verifying merge-base: "
-        gha-time stop --outcome success --name "Falling back to fetching all...🚦"
+        gha-time elapsed --outcome success --name "Falling back to fetching all...🚦"
         git merge-base $BASE_REF $HEAD_REF
     - id: finalize
       if: always()
@@ -158,7 +158,8 @@ runs:
         cd $WORKING_DIRECTORY;
         ancestor_ref="$(git merge-base $BASE_REF $HEAD_REF)";
         echo "ancestor-ref=${ancestor_ref}" >> $GITHUB_OUTPUT
-        gha-timer stop --outcome success --name "Getting merge-base (ancestor-ref)...🚦"
+        gha-timer elapsed --outcome success --name "Getting merge-base (ancestor-ref)...🚦"
+        gha-timer stop
         echo "Merge base is:"
         echo ${ancestor_ref}
         echo "Action succeeded! ✅"

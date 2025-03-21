@@ -77,6 +77,8 @@ outputs:
 runs:
   using: "composite"
   steps: 
+    - id: setup-gha-timer
+      uses: fulcrumgenomics/gha-timer@v1
     - id: print-banner
       name: Print Banner
       shell: bash
@@ -95,7 +97,7 @@ runs:
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
         FALLBACK_FETCH_ALL: ${{ inputs.fallback-fetch-all }}
       run: |
-        echo "::group::Setting up environment variables...🚦"
+        gha-timer start --name "Setting up environment variables...🚦"
         cd $WORKING_DIRECTORY;
         if [ -z "$BASE_REF" ] ; then
             export GITHUB_BASE_REF="$FALLBACK_BASE_REF"
@@ -115,7 +117,7 @@ runs:
         echo "GITHUB_HEAD_REF=$GITHUB_HEAD_REF"
         export GITHUB_BASE_REF
         export GITHUB_HEAD_REF
-        echo "::endgroup::"
+        gha-timer elapsed --outcome success --name "Setting up environment variables...🚦"
         set -euo pipefail
         bash ${{ github.action_path }}/src/scripts/fetch_through_merge_base.sh        
     # Note: `outcome` does not consider `continue-on-error`
@@ -137,11 +139,12 @@ runs:
         HEAD_REF: ${{ steps.fetch_through_merge_base.outputs.head-ref }}
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
       run: |
-        echo "::group::Falling back to fetching all...🚦"
+        gha-time start --name "Falling back to fetching all...🚦"
         cd $WORKING_DIRECTORY;
         git fetch --all --unshallow --verbose;
         python ${{ github.action_path }}/src/scripts/git_ungraft.py;
         echo -n "Verifying merge-base: "
+        gha-time stop --outcome success --name "Falling back to fetching all...🚦"
         git merge-base $BASE_REF $HEAD_REF
     - id: finalize
       if: always()
@@ -151,11 +154,11 @@ runs:
         HEAD_REF: ${{ steps.fetch_through_merge_base.outputs.head-ref }}
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
       run: |
-        echo "::group::Getting merge-base (ancestor-ref)...🚦"
+        gha-timer start --name "Getting merge-base (ancestor-ref)...🚦"
         cd $WORKING_DIRECTORY;
         ancestor_ref="$(git merge-base $BASE_REF $HEAD_REF)";
         echo "ancestor-ref=${ancestor_ref}" >> $GITHUB_OUTPUT
-        echo "::endgroup::"
+        gha-timer stop --outcome success --name "Getting merge-base (ancestor-ref)...🚦"
         echo "Merge base is:"
         echo ${ancestor_ref}
         echo "Action succeeded! ✅"

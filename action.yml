@@ -82,6 +82,11 @@ runs:
       shell: bash
       run: |
         cat ${GITHUB_ACTION_PATH}/src/misc/banner.txt
+    - id: setup-python
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+      with:
+        python-version: "3.12"
+        update-environment: false
     - id: setup-gha-timer
       uses: fulcrumgenomics/gha-timer@6c2d3c71524c884b8b472fb888ff25fbc4d24e61 # v1.1.0
       with:
@@ -144,7 +149,7 @@ runs:
         gha-timer start --name "Falling back to fetching all...🚦"
         cd $WORKING_DIRECTORY;
         git fetch --all --unshallow --verbose;
-        python ${{ github.action_path }}/src/scripts/git_ungraft.py;
+        "${{ steps.setup-python.outputs.python-path }}" ${{ github.action_path }}/src/scripts/git_ungraft.py;
         echo -n "Verifying merge-base: "
         gha-timer elapsed --outcome success --name "Falling back to fetching all...🚦"
         git merge-base $BASE_REF $HEAD_REF

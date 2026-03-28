@@ -83,7 +83,7 @@ runs:
       run: |
         cat ${GITHUB_ACTION_PATH}/src/misc/banner.txt
     - id: setup-gha-timer
-      uses: fulcrumgenomics/gha-timer@v1
+      uses: fulcrumgenomics/gha-timer@6c2d3c71524c884b8b472fb888ff25fbc4d24e61 # v1.1.0
       with:
         skip-banner: true
     - id: fetch_through_merge_base

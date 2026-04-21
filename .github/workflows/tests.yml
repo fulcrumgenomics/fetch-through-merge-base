@@ -105,3 +105,13 @@ jobs:
         fail-after: 2
         fallback-fetch-all: true
         ancestor-ref: "6eb785672d2c6770af9e985d36ddcd1b3a285f8e"
+    # Regression test for the parent-parsing bug fixed in this PR: the tip of
+    # test-0002-parent-in-body has a commit message body whose lines start with
+    # "parent ", which the old `git cat-file -p | grep '^parent'` pipeline would
+    # misinterpret as a parent-header line and attempt to fetch.
+    - name: Test parent-like text in commit body
+      uses: ./.github/actions/testing
+      with:
+        base-ref: "main"
+        head-ref: "test-0002-parent-in-body"
+        ancestor-ref: "6eb785672d2c6770af9e985d36ddcd1b3a285f8e"

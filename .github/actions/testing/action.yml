@@ -55,7 +55,10 @@ inputs:
     default: true
     required: false
     description: >
-      Passed through to the action under test; see its documentation.
+      True to emit per-step timings via fulcrumgenomics/gha-timer,
+      false to skip the gha-timer setup step entirely.  Set this to
+      false in environments where installing gha-timer is undesirable
+      (e.g. self-hosted runners with restricted egress).
   ancestor-ref:
     default: ""
     required: false

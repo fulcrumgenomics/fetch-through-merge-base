@@ -6,7 +6,10 @@ FAIL_AFTER=${FAIL_AFTER:-1000}
 
 SCRIPT_DIR=$(dirname ${BASH_SOURCE[0]});
 
-gha-timer start --name "Attempts remaining: ${FAIL_AFTER} 🚦"
+# shellcheck source=./gha_timer_wrapper.sh
+. "${SCRIPT_DIR}/gha_timer_wrapper.sh"
+
+gha_timer start --name "Attempts remaining: ${FAIL_AFTER} 🚦"
 
 if [ -z "${GITHUB_HEAD_REF}" ]; then
   echo "Empty GITHUB_HEAD_REF!";
@@ -52,7 +55,7 @@ GITHUB_HEAD_REF=$(git rev-parse "__github_head_ref__");
 # For merge commits we need to fetch both parents (e.g. from GitHub PRs)
 git_fetch_parents "${GITHUB_BASE_REF}";
 git_fetch_parents "${GITHUB_HEAD_REF}";
-python ${SCRIPT_DIR}/git_ungraft.py;
+bash ${SCRIPT_DIR}/git_ungraft.sh;
 
 # keep fetching deeper until we find the common ancestor reference
 while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; do
@@ -61,7 +64,7 @@ while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; 
   let FAIL_AFTER="FAIL_AFTER-1";
   set -e;
   if [ "$FAIL_AFTER" -le 0 ]; then
-    gha-timer elapsed --outcome failure
+    gha_timer elapsed --outcome failure
     echo "Failed to find the common ancestors of GITHUB_BASE_REF=${GITHUB_BASE_REF} and GITHUB_HEAD_REF=${GITHUB_HEAD_REF}";
     echo "Failure! ❌"
     exit 1;
@@ -69,14 +72,14 @@ while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; 
   # fetch deeper
   git fetch --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_HEAD_REF";
   git fetch --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_BASE_REF";
-  python ${SCRIPT_DIR}/git_ungraft.py;
+  bash ${SCRIPT_DIR}/git_ungraft.sh;
   echo "Deepend search by ${DEEPEN_LENGTH}‼️";
-  gha-timer elapsed --outcome skipped
-  gha-timer start --name "Attempts remaining: ${FAIL_AFTER} 🚦"
+  gha_timer elapsed --outcome skipped
+  gha_timer start --name "Attempts remaining: ${FAIL_AFTER} 🚦"
 done
 
 
 # cleanup
 git branch -D __github_base_ref__ __github_head_ref__;
-gha-timer elapsed --outcome success
+gha_timer elapsed --outcome success
 echo "Success! ✅"

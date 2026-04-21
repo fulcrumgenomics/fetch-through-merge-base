@@ -49,8 +49,13 @@ inputs:
     default: false
     required: false
     description: >
-      True to fetch all commits if number of attempts to deepen reaches 
+      True to fetch all commits if number of attempts to deepen reaches
       its limit, false to fail the action.
+  enable-timing:
+    default: true
+    required: false
+    description: >
+      Passed through to the action under test; see its documentation.
   ancestor-ref:
     default: ""
     required: false
@@ -79,6 +84,7 @@ runs:
         fail-after: ${{ inputs.fail-after }}
         working-directory: ./__testing_dir__
         fallback-fetch-all: ${{ inputs.fallback-fetch-all }}
+        enable-timing: ${{ inputs.enable-timing }}
     - name: cleanup the testing directory
       shell: bash
       run: rm -rf __testing_dir__

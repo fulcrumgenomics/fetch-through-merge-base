@@ -115,3 +115,13 @@ jobs:
         base-ref: "main"
         head-ref: "test-0002-parent-in-body"
         ancestor-ref: "6eb785672d2c6770af9e985d36ddcd1b3a285f8e"
+    # Exercises the enable-timing=false opt-out: the setup-gha-timer step is
+    # skipped and the shared wrapper falls back to ::group::/::endgroup::
+    # workflow commands.  The merge-base result must be unchanged.
+    - name: Test enable-timing opt-out
+      uses: ./.github/actions/testing
+      with:
+        head-ref: "test-0001-head-ref"
+        base-ref: "test-0001-base-ref"
+        enable-timing: false
+        ancestor-ref: "6eb785672d2c6770af9e985d36ddcd1b3a285f8e"

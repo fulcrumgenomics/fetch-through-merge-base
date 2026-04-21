@@ -1,30 +1,40 @@
 # Release
 
-- Ensure the [CHANGELOG](./CHANGELOG.md) is up-to-date.
+Releases are produced by pushing a `vX.Y.Z` tag to `main`. The
+[`publish` workflow](./.github/workflows/release.yml) then runs the test suite,
+generates a changelog with [git-cliff](https://git-cliff.org/), and creates a
+GitHub Release, also moving the floating major-version tag (e.g. `v1`) to the
+new commit.
 
-- Ensure that `package.json` and `package-lock.json` have the correct `version` property (use `npm version --no-git-tag-version X.Y.Z`).
+All contributions land on `main` via pull request; there is no separate
+`develop` branch.
 
-- If this release is a major version, update all the example YAML in the
-  [README](./README.md), e.g. `2.0.0` would need `@v1` -> `@v2`.
+## Cutting a release
 
-- All contributions currently go to the `develop` branch. To make a new
-  release, checkout to the `main` branch and merge with `develop` and then proceed
-  with the release process.
+1. Ensure the [CHANGELOG](./CHANGELOG.md) has an entry for `vX.Y.Z`.
 
-```bash
-git checkout develop
-git pull origin develop
-git checkout main
-git pull origin main
-git merge develop
-git push origin main
-```
+2. Bump `package.json` and `package-lock.json` to the new version:
 
-- Create a new named tag:
+   ```bash
+   npm version --no-git-tag-version X.Y.Z
+   ```
 
-```bash
-git tag -a -m 'Release version vX.Y.Z'
-```
+   The `check-version` job in the `publish` workflow compares `package.json`
+   to the tag and fails the release if they don't match.
 
-Replace `X.Y.Z` by the appropriate version number.
+3. If this is a major version bump, update all example YAML in the
+   [README](./README.md) (e.g. `@v1` → `@v2`).
 
+4. Open a pull request with the above changes and merge it to `main`.
+
+5. Tag the merge commit on `main` and push the tag:
+
+   ```bash
+   git checkout main
+   git pull origin main
+   git tag -a -m 'Release version vX.Y.Z' vX.Y.Z
+   git push origin vX.Y.Z
+   ```
+
+   Replace `X.Y.Z` with the appropriate version number. Pushing the tag
+   triggers the `publish` workflow.

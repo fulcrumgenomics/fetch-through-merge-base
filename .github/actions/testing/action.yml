@@ -52,13 +52,14 @@ inputs:
       True to fetch all commits if number of attempts to deepen reaches
       its limit, false to fail the action.
   enable-timing:
-    default: true
+    default: 'true'
     required: false
     description: >
       True to emit per-step timings via fulcrumgenomics/gha-timer,
-      false to skip the gha-timer setup step entirely.  Set this to
+      false to skip the gha-timer setup step entirely. Set this to
       false in environments where installing gha-timer is undesirable
-      (e.g. self-hosted runners with restricted egress).
+      (e.g. self-hosted runners with restricted egress).  Accepted
+      values are the strings 'true' and 'false'.
   ancestor-ref:
     default: ""
     required: false

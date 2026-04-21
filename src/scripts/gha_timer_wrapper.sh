@@ -6,6 +6,12 @@
 # (`::group::` / `::endgroup::`) so the log remains collapsible in the
 # workflow UI.
 #
+# The fallback is strictly best-effort log grouping: it emits no
+# timing data and silently drops `gha_timer stop` (the cumulative
+# summary the real binary prints has no analogue in workflow
+# commands).  Users who need per-step timings must leave
+# `enable-timing` on so the real binary is on PATH.
+#
 # This file is intended to be `source`d from bash scripts and from
 # inline `run:` blocks in action.yml.  It is NOT a standalone script.
 

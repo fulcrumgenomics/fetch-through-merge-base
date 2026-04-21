@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
 
 DEEPEN_LENGTH=${DEEPEN_LENGTH:-10}
 FAIL_AFTER=${FAIL_AFTER:-1000}
@@ -13,11 +14,11 @@ SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}");
 
 gha_timer start --name "Attempts remaining: ${FAIL_AFTER} 🚦"
 
-if [ -z "${GITHUB_HEAD_REF}" ]; then
+if [ -z "${GITHUB_HEAD_REF:-}" ]; then
   echo "Empty GITHUB_HEAD_REF!";
   exit 1;
 fi
-if [ -z "${GITHUB_BASE_REF}" ]; then
+if [ -z "${GITHUB_BASE_REF:-}" ]; then
   echo "Empty GITHUB_BASE_REF!";
   exit 1;
 fi
@@ -29,8 +30,6 @@ if [ -z "${FAIL_AFTER}" ]; then
   echo "Empty FAIL_AFTER!";
   exit 1;
 fi
-
-set -eou pipefail
 
 # Fetch a branch or tag, and track it.  Do not fetch if a commit (yet).
 if [[ "${GITHUB_BASE_REF}" != "$(git rev-parse --verify "${GITHUB_BASE_REF}")" ]]; then
@@ -65,7 +64,7 @@ while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; 
   git fetch --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_HEAD_REF";
   git fetch --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_BASE_REF";
   bash "${SCRIPT_DIR}/git_ungraft.sh";
-  echo "Deepend search by ${DEEPEN_LENGTH}‼️";
+  echo "Deepened search by ${DEEPEN_LENGTH}‼️";
   gha_timer elapsed --outcome skipped
   gha_timer start --name "Attempts remaining: ${FAIL_AFTER} 🚦"
 done

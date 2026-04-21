@@ -59,18 +59,31 @@ work_dir=.
 while [ $# -gt 0 ]; do
     case "$1" in
         -n|--dry-run) dry_run=1; shift ;;
-        -C|--git-dir) work_dir="$2"; shift 2 ;;
+        -C|--git-dir)
+            [ $# -ge 2 ] || { echo "Missing value for $1" >&2; usage; exit 2; }
+            work_dir="$2"; shift 2 ;;
         -h|--help)    usage; exit 0 ;;
         *) echo "Unknown argument: $1" >&2; usage; exit 2 ;;
     esac
 done
 
-if ! git_dir="$(git -C "$work_dir" rev-parse --git-dir 2>/dev/null)"; then
+# Use `--git-common-dir`, not `--absolute-git-dir`: `.git/shallow` lives
+# in the common git dir, not the per-worktree gitdir.  In a linked
+# worktree, `--absolute-git-dir` returns `.git/worktrees/<name>`, so
+# `${git_dir}/shallow` would be a non-existent path and the script would
+# silently exit with "No candidate commits to ungraft".
+#
+# `--git-common-dir` returns an absolute path in a linked worktree but
+# a path relative to `$work_dir` in the primary worktree (e.g. `.git`),
+# so resolve the relative case against `$work_dir` explicitly.
+if ! git_dir="$(git -C "$work_dir" rev-parse --git-common-dir 2>/dev/null)"; then
     echo "The path ${work_dir} is not within a git repository" >&2
     exit 1
 fi
-# Normalize to absolute so later lookups don't depend on cwd.
-git_dir="$(cd "$work_dir" && cd "$git_dir" && pwd)"
+case "$git_dir" in
+    /*) ;;
+    *) git_dir="$(cd "$work_dir" && cd "$git_dir" && pwd)" ;;
+esac
 shallow_file="${git_dir}/shallow"
 
 if [ ! -f "$shallow_file" ]; then
@@ -84,10 +97,19 @@ while IFS= read -r sha || [ -n "$sha" ]; do
     [ -z "$sha" ] && continue
     all_present=1
     # Read the raw commit object and emit only parent-header SHAs from
-    # the header block (awk exits on the first blank line, which
-    # terminates the header and begins the commit message body).
+    # the header block.  awk sets `in_body` at the first blank line
+    # (which terminates the header and begins the commit message body)
+    # and then consumes the rest of the stream without printing.  Do
+    # NOT use `awk '/^$/ { exit }'` here: under `set -o pipefail`, an
+    # early-exit awk closes the read end of the pipe and causes
+    # `git cat-file` to die of SIGPIPE when the commit body exceeds the
+    # pipe buffer (~64 KB on Linux), aborting the script.
     parents="$(git -C "$work_dir" cat-file -p "$sha" \
-        | awk '/^$/ { exit } $1 == "parent" { print $2 }')"
+        | awk '
+            in_body { next }
+            /^$/ { in_body = 1; next }
+            $1 == "parent" { print $2 }
+        ')"
     for parent in $parents; do
         if ! git -C "$work_dir" cat-file -e "${parent}^{commit}" 2>/dev/null; then
             all_present=0
@@ -101,7 +123,10 @@ while IFS= read -r sha || [ -n "$sha" ]; do
     fi
 done < "$shallow_file"
 
-# Only rewrite when the set actually changed (preserve mtime on no-op).
+# `candidates` is nonempty iff the set of grafted commits changed, so
+# this predicate is equivalent to the Python original's
+# `if set(grafted) != set(remaining)`.  Skipping the rewrite when the
+# set is unchanged preserves the shallow file's mtime on no-op runs.
 if [ "$dry_run" -eq 0 ] && [ "${#candidates[@]}" -gt 0 ]; then
     tmp="${shallow_file}.tmp"
     if [ "${#remaining[@]}" -gt 0 ]; then

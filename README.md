@@ -80,7 +80,7 @@ A GitHub Action for fetching PR commits through the merge-base
     # True to emit per-step timings via fulcrumgenomics/gha-timer, false to skip the
     # gha-timer setup step entirely. Set this to false in environments where
     # installing gha-timer is undesirable (e.g. self-hosted runners with restricted
-    # egress).
+    # egress). Accepted values are the strings 'true' and 'false'.
     # Default: true
     enable-timing: ''
 ```

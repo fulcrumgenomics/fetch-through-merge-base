@@ -57,13 +57,14 @@ inputs:
       True to fetch all commits if number of attempts to deepen reaches
       its limit, false to fail the action.
   enable-timing:
-    default: true
+    default: 'true'
     required: false
     description: >
       True to emit per-step timings via fulcrumgenomics/gha-timer,
-      false to skip the gha-timer setup step entirely.  Set this to
+      false to skip the gha-timer setup step entirely. Set this to
       false in environments where installing gha-timer is undesirable
-      (e.g. self-hosted runners with restricted egress).
+      (e.g. self-hosted runners with restricted egress).  Accepted
+      values are the strings 'true' and 'false'.
 outputs:
   base-ref:
     description: >
@@ -90,6 +91,14 @@ runs:
       shell: bash
       run: |
         cat ${GITHUB_ACTION_PATH}/src/misc/banner.txt
+    - id: validate-enable-timing
+      if: ${{ inputs.enable-timing != 'true' && inputs.enable-timing != 'false' }}
+      shell: bash
+      env:
+        ENABLE_TIMING: ${{ inputs.enable-timing }}
+      run: |
+        echo "enable-timing must be 'true' or 'false'; got '${ENABLE_TIMING}'" >&2
+        exit 2
     - id: setup-gha-timer
       if: ${{ inputs.enable-timing == 'true' }}
       uses: fulcrumgenomics/gha-timer@d0d886fa587c7f4f714e64d84aa6e274e818d48b # v1.1.1
@@ -131,7 +140,7 @@ runs:
         export GITHUB_HEAD_REF
         gha_timer elapsed --outcome success --name "Setting up environment variables...🚦"
         set -euo pipefail
-        bash ${{ github.action_path }}/src/scripts/fetch_through_merge_base.sh
+        bash "${{ github.action_path }}/src/scripts/fetch_through_merge_base.sh"
     # Note: `outcome` does not consider `continue-on-error`
     # Note: fallback-fetch-all is a string, not a boolean, since type is not supported
     # for inputs on composite actions (only workflows).
@@ -155,7 +164,7 @@ runs:
         gha_timer start --name "Falling back to fetching all...🚦"
         cd $WORKING_DIRECTORY;
         git fetch --all --unshallow --verbose;
-        bash ${{ github.action_path }}/src/scripts/git_ungraft.sh;
+        bash "${{ github.action_path }}/src/scripts/git_ungraft.sh";
         echo -n "Verifying merge-base: "
         gha_timer elapsed --outcome success --name "Falling back to fetching all...🚦"
         git merge-base $BASE_REF $HEAD_REF

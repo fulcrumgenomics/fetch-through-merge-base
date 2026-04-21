@@ -1,6 +1,6 @@
 {
   "name": "fetch-through-merge-base",
-  "version": "1.3.0",
+  "version": "1.4.3",
   "description": "fetch through merge base",
   "scripts": {
     "build": "tsc && node lib/misc/generate-docs.js",

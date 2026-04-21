@@ -1,5 +1,18 @@
 # Changelog
 
+## [v1.4.3] (2026-04-20)
+
+- Fix: parent extraction no longer matches commit message body lines that start with `parent ` (#58)
+- Feature: use `gha-timer` for step timing and log grouping, and skip its banner (#35, #36)
+- Feature: add a release workflow that publishes a GitHub Release and updates the floating major-version tag on tag push (#35)
+- CI: pin GitHub Actions by commit SHA with trailing version comments; drop deprecated runners (#56)
+- CI: bump `gha-timer` to v1.1.1 (#59)
+- Fix: explicitly install Python 3.12 via `actions/setup-python` instead of relying on the runner's default (#57)
+- Documentation: update Fulcrum Genomics logo to support light/dark themes; fix logo links (#39, #55)
+- Chore: remove unused dependabot config; bump dev dependencies (#38)
+
+[v1.4.3]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.4.3
+
 ## [v1.4.2] (2025-03-19)
 
 - [#31] Fix `fail-after` number of iterations and related tests

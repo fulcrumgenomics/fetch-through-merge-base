@@ -38,6 +38,49 @@ jobs:
             echo "::error::Unstaged changes detected. Locally try running: git clean -ffdx && npm ci && npm run format && npm run build"
             exit 1
           fi
+  shellcheck:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+    - name: Install shellcheck
+      run: sudo apt-get update && sudo apt-get install -y shellcheck
+    - name: Run shellcheck
+      run: |
+        shellcheck \
+          -x \
+          --severity=style \
+          --source-path=SCRIPTDIR \
+          src/scripts/*.sh \
+          tests/*.sh
+  shell-tests:
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, ubuntu-22.04, macos-15, macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+    - name: Setup gha-timer
+      uses: fulcrumgenomics/gha-timer@d0d886fa587c7f4f714e64d84aa6e274e818d48b # v1.1.1
+      with:
+        skip-banner: true
+    - name: Run shell unit tests
+      shell: bash
+      run: |
+        set -euo pipefail
+        # shellcheck disable=SC1091
+        source src/scripts/gha_timer_wrapper.sh
+        for t in tests/test_*.sh; do
+          gha_timer start --name "${t}"
+          if bash "${t}"; then
+            gha_timer elapsed --outcome success --name "${t}"
+          else
+            status=$?
+            gha_timer elapsed --outcome failure --name "${t}"
+            exit "${status}"
+          fi
+        done
   testing:
     strategy:
       matrix:

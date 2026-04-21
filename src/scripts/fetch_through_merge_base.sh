@@ -1,13 +1,15 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 
 DEEPEN_LENGTH=${DEEPEN_LENGTH:-10}
 FAIL_AFTER=${FAIL_AFTER:-1000}
 
-SCRIPT_DIR=$(dirname ${BASH_SOURCE[0]});
+SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}");
 
 # shellcheck source=./gha_timer_wrapper.sh
 . "${SCRIPT_DIR}/gha_timer_wrapper.sh"
+# shellcheck source=./git_fetch_parents.sh
+. "${SCRIPT_DIR}/git_fetch_parents.sh"
 
 gha_timer start --name "Attempts remaining: ${FAIL_AFTER} 🚦"
 
@@ -30,19 +32,11 @@ fi
 
 set -eou pipefail
 
-function git_fetch_parents() {
-    local sha1=${1};
-    for parent_sha1 in $(git show --no-patch --format='%P' "${sha1}"); do
-        git fetch --update-head-ok --update-shallow --progress --quiet --depth=1 origin "${parent_sha1}:__github_parent__";
-        git branch -D __github_parent__;
-    done
-}
-
 # Fetch a branch or tag, and track it.  Do not fetch if a commit (yet).
-if [[ "${GITHUB_BASE_REF}" != "$(git rev-parse --verify ${GITHUB_BASE_REF})" ]]; then
+if [[ "${GITHUB_BASE_REF}" != "$(git rev-parse --verify "${GITHUB_BASE_REF}")" ]]; then
     git fetch --update-head-ok --update-shallow --progress --quiet --depth=1 origin "$GITHUB_BASE_REF:$GITHUB_BASE_REF";
 fi
-if [[ "${GITHUB_HEAD_REF}" != "$(git rev-parse --verify ${GITHUB_HEAD_REF})" ]]; then
+if [[ "${GITHUB_HEAD_REF}" != "$(git rev-parse --verify "${GITHUB_HEAD_REF}")" ]]; then
     git fetch --update-head-ok --update-shallow --progress --quiet --depth=1 origin "$GITHUB_HEAD_REF:$GITHUB_HEAD_REF";
 fi
 
@@ -55,14 +49,12 @@ GITHUB_HEAD_REF=$(git rev-parse "__github_head_ref__");
 # For merge commits we need to fetch both parents (e.g. from GitHub PRs)
 git_fetch_parents "${GITHUB_BASE_REF}";
 git_fetch_parents "${GITHUB_HEAD_REF}";
-bash ${SCRIPT_DIR}/git_ungraft.sh;
+bash "${SCRIPT_DIR}/git_ungraft.sh";
 
 # keep fetching deeper until we find the common ancestor reference
 while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; do
  # check if we are done iterating
-  set +e;
-  let FAIL_AFTER="FAIL_AFTER-1";
-  set -e;
+  FAIL_AFTER=$((FAIL_AFTER - 1))
   if [ "$FAIL_AFTER" -le 0 ]; then
     gha_timer elapsed --outcome failure
     echo "Failed to find the common ancestors of GITHUB_BASE_REF=${GITHUB_BASE_REF} and GITHUB_HEAD_REF=${GITHUB_HEAD_REF}";
@@ -72,7 +64,7 @@ while [ -z "$( git merge-base "__github_base_ref__" "__github_head_ref__" )" ]; 
   # fetch deeper
   git fetch --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_HEAD_REF";
   git fetch --quiet --update-shallow --deepen="$DEEPEN_LENGTH" origin "$GITHUB_BASE_REF";
-  bash ${SCRIPT_DIR}/git_ungraft.sh;
+  bash "${SCRIPT_DIR}/git_ungraft.sh";
   echo "Deepend search by ${DEEPEN_LENGTH}‼️";
   gha_timer elapsed --outcome skipped
   gha_timer start --name "Attempts remaining: ${FAIL_AFTER} 🚦"

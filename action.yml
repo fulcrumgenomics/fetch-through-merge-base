@@ -88,7 +88,7 @@ runs:
         python-version: "3.12"
         update-environment: false
     - id: setup-gha-timer
-      uses: fulcrumgenomics/gha-timer@6c2d3c71524c884b8b472fb888ff25fbc4d24e61 # v1.1.0
+      uses: fulcrumgenomics/gha-timer@d0d886fa587c7f4f714e64d84aa6e274e818d48b # v1.1.1
       with:
         skip-banner: true
     - id: fetch_through_merge_base

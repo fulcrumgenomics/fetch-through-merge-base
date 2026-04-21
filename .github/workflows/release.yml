@@ -103,6 +103,11 @@ jobs:
         env:
           TAG_REF: ${{ github.ref_name }}
         run: |
+          # Annotated tags require a committer identity, which the runner
+          # does not have by default. Use the default github-actions[bot].
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           major_tag="${TAG_REF%%.*}"
           git tag -d "${major_tag}" || echo ""
           git tag -a -m "Release version ${TAG_REF}" "${major_tag}"

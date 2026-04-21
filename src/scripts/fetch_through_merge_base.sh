@@ -29,7 +29,7 @@ set -eou pipefail
 
 function git_fetch_parents() {
     local sha1=${1};
-    for parent_sha1 in $(git cat-file -p "${sha1}" | grep '^parent' | cut -f 2 -d ' '); do
+    for parent_sha1 in $(git show --no-patch --format='%P' "${sha1}"); do
         git fetch --update-head-ok --update-shallow --progress --quiet --depth=1 origin "${parent_sha1}:__github_parent__";
         git branch -D __github_parent__;
     done

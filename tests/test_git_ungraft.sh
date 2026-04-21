@@ -26,7 +26,7 @@ CLIENT="${TMP}/client"
 # --- build a deterministic 20-commit linear history in a local bare repo ---
 # Enough commits that a small `--deepen` leaves the file non-empty so
 # cases 2 and 3 have something to assert against.
-git init --quiet --bare "${REMOTE}"
+git init --quiet --bare -b main "${REMOTE}"
 git init --quiet -b main "${SRC}"
 (
     cd "${SRC}"

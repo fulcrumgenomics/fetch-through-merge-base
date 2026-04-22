@@ -82,9 +82,17 @@ shallow_before="$(cat "${shallow_file}")"
 # therefore changes its inode.  An mtime check is unreliable because
 # git's shallow-handling code may touch `.git/shallow` in place during
 # read-only sub-commands run by the script, producing flaky failures.
-inode_before="$(stat -f %i "${shallow_file}" 2>/dev/null || stat -c %i "${shallow_file}")"
+#
+# stat invocation is portable: try GNU (`-c %i`) first and fall back
+# to BSD (`-f %i`).  The reverse order is a cross-platform trap — on
+# GNU stat, `-f` is filesystem-info mode, which ignores `%i` and
+# dumps a multi-line blob of free-block / free-inode counts.  Those
+# counts tick between back-to-back calls on a busy CI runner, so
+# two "before"/"after" captures would differ even when the file's
+# real inode is unchanged, producing a cross-platform flake.
+inode_before="$(stat -c %i "${shallow_file}" 2>/dev/null || stat -f %i "${shallow_file}")"
 output="$(bash "${UNGRAFT}")"
-inode_after="$(stat -f %i "${shallow_file}" 2>/dev/null || stat -c %i "${shallow_file}")"
+inode_after="$(stat -c %i "${shallow_file}" 2>/dev/null || stat -f %i "${shallow_file}")"
 if [ "${output}" != "No candidate commits to ungraft" ]; then
     echo "FAIL (case 1): expected 'No candidate commits to ungraft'"
     echo "  got: ${output}"
@@ -156,10 +164,10 @@ echo "Ungraftable candidate: ${ungraftable}"
 # --- case 2: --dry-run prints candidates without rewriting ---
 # As in case 1, use inode identity to detect the script's `mv`-based
 # rewrite; mtime is unreliable here (see case 1 comment).
-inode_before="$(stat -f %i "${shallow_file}" 2>/dev/null || stat -c %i "${shallow_file}")"
+inode_before="$(stat -c %i "${shallow_file}" 2>/dev/null || stat -f %i "${shallow_file}")"
 contents_before="$(cat "${shallow_file}")"
 dry_output="$(bash "${UNGRAFT}" --dry-run)"
-inode_after="$(stat -f %i "${shallow_file}" 2>/dev/null || stat -c %i "${shallow_file}")"
+inode_after="$(stat -c %i "${shallow_file}" 2>/dev/null || stat -f %i "${shallow_file}")"
 if ! grep -qxF "Would ungraft ${ungraftable}" <<< "${dry_output}"; then
     echo "FAIL (case 2): expected 'Would ungraft ${ungraftable}' in dry-run output"
     echo "--- dry-run output ---"

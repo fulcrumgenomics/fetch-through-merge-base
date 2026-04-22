@@ -49,8 +49,17 @@ inputs:
     default: false
     required: false
     description: >
-      True to fetch all commits if number of attempts to deepen reaches 
+      True to fetch all commits if number of attempts to deepen reaches
       its limit, false to fail the action.
+  enable-timing:
+    default: 'true'
+    required: false
+    description: >
+      True to emit per-step timings via fulcrumgenomics/gha-timer,
+      false to skip the gha-timer setup step entirely. Set this to
+      false in environments where installing gha-timer is undesirable
+      (e.g. self-hosted runners with restricted egress).  Accepted
+      values are the strings 'true' and 'false'.
   ancestor-ref:
     default: ""
     required: false
@@ -79,6 +88,7 @@ runs:
         fail-after: ${{ inputs.fail-after }}
         working-directory: ./__testing_dir__
         fallback-fetch-all: ${{ inputs.fallback-fetch-all }}
+        enable-timing: ${{ inputs.enable-timing }}
     - name: cleanup the testing directory
       shell: bash
       run: rm -rf __testing_dir__

@@ -1,5 +1,15 @@
 # Changelog
 
+## [v1.5.0] (2026-04-21)
+
+- Feature: drop the Python dependency — `git_ungraft` is now a pure-bash helper, and `actions/setup-python` is no longer installed (#62)
+- Feature: `gha-timer` is now opt-out via a new `enable-timing` input (default `'true'`); set `enable-timing: 'false'` to skip installing it. When `gha-timer` is absent, the wrapper falls back to `::group::`/`::endgroup::` workflow commands so logs stay collapsible (#62)
+- Fix: `git_fetch_parents` was a silent no-op on shallow-boundary commits — the exact case it exists to handle. Rewritten to read parents via `git cat-file -p` + awk header parser; regression test added (#62)
+- CI: add a `shellcheck` job (strictest severity) and a `shell-tests` matrix (ubuntu/macos) running new unit tests for `git_ungraft.sh`, `git_fetch_parents.sh`, and `gha_timer_wrapper.sh` (#62)
+- CI: set git identity before creating the annotated major-version tag in the release workflow (#61)
+
+[v1.5.0]: https://github.com/fulcrumgenomics/fetch-through-merge-base/releases/tag/v1.5.0
+
 ## [v1.4.3] (2026-04-20)
 
 - Fix: parent extraction no longer matches commit message body lines that start with `parent ` (#58)
